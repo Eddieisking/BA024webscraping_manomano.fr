@@ -3,86 +3,126 @@ Project: Web scraping for customer reviews
 Author: Hào Cui
 Date: 07/04/2023
 """
-import json
-import re
-from urllib.parse import urlparse, parse_qs
+import time
+
+from scrapy.http import HtmlResponse
+from selenium.webdriver.support import expected_conditions as EC
 
 import scrapy
 from scrapy import Request
+from scrapy.selector import Selector
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
+from utils import create_chrome_driver
 from webscrapy.items import WebscrapyItem
 
 
 class SpiderSpider(scrapy.Spider):
     name = "spider"
-    allowed_domains = ["www.gotools.de", "api.bazaarvoice.com"]
+    allowed_domains = ["www.manomano.fr", "api.bazaarvoice.com", "iam.manomano.fr"]
     headers = {}  #
 
+    def __init__(self, name=None, **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.browser = None
+
     def start_requests(self):
-        # keywords = ['DeWalt', 'Black+and+Decker', 'Stanley', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Irwin+Tools',
-        #             'Lenox']
-        # company = 'Stanley Black and Decker'
-
+        keywords = ['DeWalt', 'Black+and+Decker', 'Stanley', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Irwin+Tools',
+                    'Lenox']
+        company = 'Stanley Black and Decker'
         keywords = ['dewalt']
-        # from search words to generate product_urls
-        for keyword in keywords:
-            push_key = {'keyword': keyword}
-            search_url = f'https://www.gotools.de/search?query={keyword}'
 
-            yield Request(
-                url=search_url,
-                callback=self.parse,
-                cb_kwargs=push_key,
-            )
+        """This part should be changed by finding the page numbers of different brand"""
+        for page in range(1,6):
+            start_url = f'https://www.manomano.fr/marque/dewalt-3?page={page}'
 
-    def parse(self, response, **kwargs):
-        # Extract the pages of product_urls
-        last_link = response.xpath('//*[@id="page-body"]//nav[@class="pagination-container"]/ul//li[@class="item pag-arrow-right"]/a[@aria-label="Zur letzten Seite"]/@href')[0].extract()
-        # Extract the page number from the last link
-        parsed_url = urlparse(last_link)
-        query_params = parse_qs(parsed_url.query)
-        page_number = int(query_params.get('page')[0])
+            # Load start_url
+            self.browser = create_chrome_driver(headless=False)
+            self.browser.get(start_url)
 
-        # Based on pages to build product_urls
-        keyword = kwargs['keyword']
-        product_urls = [f'https://www.gotools.de/search?query={keyword}&page={page}' for page
-                        in range(3, page_number + 1)]  # page_number + 1
+            time.sleep(5)
+            product_links = self.browser.find_elements(By.XPATH,
+                                                 '//div[@class="tG5dru c5PGVKq"]/a')
 
-        for product_url in product_urls:
-            yield Request(url=product_url, callback=self.product_parse)
+            # Print the extracted information
+            review_url_list = []
+            for i in range(0, len(product_links)):
+                product_url = product_links[i].get_attribute("href")
+                review_url = product_url + f'#tab-reviews'
+                review_url_list.append(review_url)
 
-    def product_parse(self, response: Request, **kwargs):
-        product_list = response.xpath('//*[@id="page-body"]//ul[@class="product-list fx-row grid cross-box"]/li')
+            """the review_url_list number can be adjusted by purpose"""
+            for review_url in review_url_list[0:3]:
+                self.browser = create_chrome_driver(headless=False)
+                self.browser.get(review_url)
+                """Click the custom infor"""
+                self.browser.find_element(By.XPATH, '//button[@id="didomi-notice-agree-button"]').click()
 
-        for product in product_list:
-            product_id = re.search(r'{"item":{"id":(\d+)', product.extract()).group(1)
-            product_name = re.search(r'"name1":"(.*?)",', product.extract()).group(1)
+                time.sleep(5)
+                try:
+                    self.browser.find_element(By.XPATH, '//input[@type="checkbox"]').click()
+                except:
+                    print('No more robot test')
 
-            customer_review_url = f'https://www.gotools.de/rest/feedbacks/feedback/helper/feedbacklist/{product_id}/1?feedbacksPerPage=10'
-            yield Request(url=customer_review_url, callback=self.review_parse, meta={'product_id': product_id, 'product_name': product_name})
+                """Click the more reviews button to load all infor"""
+                while True:
+                    try:
+                    # Click the load more button
+                        more_review_button = self.browser.find_element(By.XPATH, '//div[@data-testid="see-more-reviews"]')
+                        more_review_button.click()
+                        time.sleep(1)
+                    except:
+                        print('No more pages')
 
-    def review_parse(self, response: Request, **kwargs):
-        product_id = response.meta['product_id']
-        product_name = response.meta['product_name']
-        datas = json.loads(response.body)
-        batch_results = datas.get('feedbacks', {})
+                    # Click the next load more button
+                    try:
+                        more_review_button_new = WebDriverWait(self.browser, 5).until(
+                            EC.presence_of_element_located((By.XPATH, '//div[@data-testid="see-more-reviews"]'))
+                        )
+                        more_review_button = more_review_button_new
+                    except:
+                        print('No more extra pages')
+                        break
+                print('No more extra customer reviews')
 
-        for i in range(len(batch_results)):
+                # Use selenium page source to pass the response
+                body = self.browser.page_source
+
+                """Randomly select one open website"""
+                url = 'https://taobao.com/'
+                response = HtmlResponse(url=url, body=body, encoding='utf-8')
+                # Create a new Request object based on the HtmlResponse
+                request = Request(url=url, meta={'response': response}, callback=self.customer_review_parse,
+                                  dont_filter=True)
+
+                yield request
+
+    def customer_review_parse(self, response):
+        html_response = response.meta['response']
+        selector = Selector(response=html_response)
+
+        review_list = selector.xpath('//div[@class="c44RvHG"]/div[@class="jPgt-8"]')
+
+        # Apply selectors to extract information
+        for review in review_list:
             item = WebscrapyItem()
 
+            item['product_name'] = selector.xpath('//div[@class="Z5H6D3"]/text()')[0].extract() or 'N/A'
+            item['customer_name'] = review.xpath('./header/div[1]/text()')[0].extract() or 'N/A'
+            item['customer_date'] = review.xpath('./header/div[2]/text()')[0].extract() or 'N/A'
+            item['customer_review'] = review.xpath('.//div[@class="duBtRc c1sdlQn"]/text()')[0].extract() or 'N/A'
+            item['customer_support'] = review.xpath('.//div[@class="b38yzx jKP2zg c35g1Kh gS1w88 UKD0Oa"]/text()')[
+                                           0].extract() or 'N/A'
+
+            """Some reviews have special format"""
             try:
-                item['review_id'] = batch_results[i].get('feedbackComment', 'N/A').get('commentId', 'N/A')
-                item['product_name'] = product_name or product_id
-                item['customer_name'] = batch_results[i].get('authorName', 'Anonymous')
-                item['customer_rating'] = batch_results[i].get('feedbackRating', 'N/A').get('rating', 'N/A').get('ratingValue', 'N/A')
-                item['customer_date'] = batch_results[i].get('feedbackComment', 'N/A').get('comment', 'N/A').get('createdAt', 'N/A')
-                item['customer_review'] = batch_results[i].get('feedbackComment', 'N/A').get('comment', 'N/A').get('message', 'N/A')
-                item['customer_support'] = batch_results[i].get('TotalPositiveFeedbackCount', 'N/A')
-                item['customer_disagree'] = batch_results[i].get('TotalNegativeFeedbackCount', 'N/A')
+                item['customer_rating'] = review.xpath('./div[1]/span/@aria-label')[0].extract()
+                item['customer_purchase_date'] = review.xpath('./div[2]/text()')[0].extract() or 'N/A'
 
-                yield item
-            except Exception as e:
-                print('Exception:', e)
-                break
+            except:
+                item['customer_rating'] = review.xpath('./div[2]/span/@aria-label')[0].extract() or 'N/A'
+                item['customer_purchase_date'] = review.xpath('./div[3]/text()')[0].extract() or 'N/A'
 
+            yield item
 

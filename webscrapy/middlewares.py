@@ -12,10 +12,8 @@ from scrapy.exceptions import IgnoreRequest, NotConfigured
 from itemadapter import is_item, ItemAdapter
 
 def get_cookies_dict():
-    cookies_str = 'session-id=262-5810110-4651945; ubid-acbuk=257-6978771-9482927; lc-acbuk=en_GB; ' \
-                  'av-timezone=Europe/London; ' \
-                  'session-token=DOVZpTftMkUoO5VyBKks7lmDekubDW0tOJ/Y8RFlRCDcQNMY9anb57YIE61uvnNfAPAU66EyGAc8DqO' \
-                  '/ZMK3goltzXQk74bkMIZ3blfypkZD9i4g5AO2dfs6WUwoHB4od8kwqIOj6ES9kJW0weMmjYApvtAIk6gWp5CjVLJ47uP0nRCUiTs8G5JIMsqjwxfHtGnWSqgR2I+lwltG3l0/liTbKeUAkXFyLxSQr9zz0ZafpcrzIKJceuTtwMyRk8sD; x-acbuk="shubALQENXQDItWhyI3ywt5EDiCNBbXUzZxfVHH9lWROOPcIA1q?BbuwaQt63DTE"; at-acbuk=Atza|IwEBIFEhoQBEgsl13zRH7tbqZZsLkFdSErJL6Jpi6Ifp9c_RyZ1tOhe7IfKF6nnJIh4hUThrCCZEVx6oYY0G15ffaTbjgdGYLF135v9-KfnBvEYFIpug_gBh3M1fdnB6lZZD8XTNQz-jsWttVgTtHuEzksP1pNtNsThE4BRKD4DtFSgu34T2Q5eImhkKWwlSTfSYcE1XeAhMnuxcQBcuS-TRVIc5NXki7U0ydlVIKkGvCyZKRg; sess-at-acbuk="+dmR+g8Ip+sCWW69DkUyjUV8hffpBaRX/184ZeqVZPk="; sst-acbuk=Sst1|PQH59LJBGdPDpiPYay9TQjKgCTur4B_PjtkbLg3tmdmH6cMrIfsn-19grn3avly8z5lHqWBXUDrgslHmXWeLxndLGO-_TnF9FBKniR-hLl-W7O7kH0vpUajOjSAEJZUvTND9zvrxQP375bqjQyzEiGM-nVmoeQ4l9pv2EelRBehMRHyMjebmhyz5kVmW5-wZo3ui_7ZIoOIGw_nUBzx-s64hnjZ_Lpl9lN1fSst5eCzgt3nK74MqKlowJkghFOAoHFjU5nsP2vmzyq6GEgxUVOG9MIABXnggOQRzXyw9wJwNWtc; session-id-time=2082787201l; i18n-prefs=GBP; csm-hit=tb:XWX730Q202Q0YG44CV43+s-XWX730Q202Q0YG44CV43|1686670523540&t:1686670523540&adb:adblk_no '
+    cookies_str = 'mm_visitor_id=5ca45b1d-a05b-4565-b24b-79e5d0cffcbe; didomi_token=eyJ1c2VyX2lkIjoiMTg4ZGQzNGQtNmYxYi02NWY2LTg2ZWEtZWMzZjI0NzgxY2FlIiwiY3JlYXRlZCI6IjIwMjMtMDYtMjFUMDk6MDc6MDYuNzgxWiIsInVwZGF0ZWQiOiIyMDIzLTA2LTIxVDA5OjA3OjA2Ljc4MVoiLCJ2ZW5kb3JzIjp7ImVuYWJsZWQiOlsiYzp2ZW5kb3JuZWMtTGFjMkJXNEQiLCJjOnZlbmRvcnN0YS1hd2ZUVUNBUCIsImM6dmVuZG9ycHJlLWNGaVhEeEhLIiwiYzp2ZW5kb3JtYXItQUFHdFBBSGYiXX0sInB1cnBvc2VzIjp7ImVuYWJsZWQiOlsic3RhdGlzdGljcyIsInVzZXJQcmVmZXJlbmNlcyIsInBlcnNvbmFsaXNlZEFkdmVydGlzaW5nIl19LCJ2ZXJzaW9uIjoyfQ==; euconsent-v2=CPttmcAPttmcAAHABBENDJCgAAAAAAAAAAqIAAAAAAAA.YAAAAAAAAAAA; _gcl_au=1.1.188159675.1687338427; mm_ab_test_version=240ad5c4fdad2262c1f4ba39a89228b0; mm_ab_tests=60.1|303.0|368.1|371.1|785.1|877.1|959.1|941.1|1016.1|1039.1|1043.1|1129.1|1146.1|1150.0|1151.1|1156.1|1157.1|1207.1|1215.1|1218.1|1228.1|1233.1|1243.1|1245.1|1205.1|1331.1|1355.1|1388.1|1389.0|1455.1|1457.0|1521.1|1522.1|1523.1|1524.0|1526.1|1533.0|1534.1|1553.1|1652.1|1686.0|1753.1|1759.0|1762.1|1765.1|1359.1|1786.1|1916.1|1983.1|1984.1|1985.1|1986.1|2015.1|2048.1|2180.1|2312.0|2345.1|2412.1|2511.1|2513.1|2544.1|2643.1|2675.1|2676.1|2708.0|2807.1|2843.0|2906.1|2939.0|2973.1|3005.1|3039.0|3072.1|3104.1|3171.1|3172.1|3203.1|3205.1|3335.1|3336.1|3006.1|3434.1|3533.1|3566.0|988.1|3632.0|3732.0|3797.0|3863.0; request_uri=L29hdXRoL3Rva2Vu; referer_id=3; PHPSESSID=nnl4vk44bn4b5ti7haqqvg3864; ab_testing_theme=a; _ALGOLIA=anonymous-04c2bef0-986e-4197-8cda-2eb825d28d74; _hjSessionUser_919765=eyJpZCI6ImM5NDYzYjc1LTliOWUtNWRkYy1hOGE3LTFlNTcyOGRiMWMyOSIsImNyZWF0ZWQiOjE2ODg3MjgyMjY3MzAsImV4aXN0aW5nIjpmYWxzZX0=; _fbp=fb.1.1688728226860.823835840; _gid=GA1.2.1308908793.1688850622; _spmm_ses.1574=*; ln_or=eyIzOTIyNTUzIjoiZCJ9; _ga=GA1.2.1004305271.1687338429; _uetsid=d958d3c01dd311eea9fa29441a191757; _uetvid=0036c530101311ee91f7737f3b343b65; cto_bundle=mh6zzl81ZEJCZDBhWTZiUGxNQko5RzMzSWRoaWNrSlV3JTJCN1kwVUtuQzhxT2NyNGtkdk84N0g4VXc0dGF4OFowT254UTJWNWtibm9vMEY3dnVlZW9oOGZHNWppcXVwRHBtekh1dW9uSVV3QWlYOGt3WWRLcUtPSHFjT0s3bTM3cjRLOGslMkZ4VzVGaHFHdGxXMGdMb2JQRmdha0pWMElPZDdDWVdWYWQlMkJmYzAzaGhaTk40dyUyQmlEQUtzRm4lMkZLVjF4VSUyQkowM0o; ABTastySession=mrasn=&lp=https%253A%252F%252Fwww.manomano.fr%252Fmarque%252Fdewalt-3; _spmm_id.1574=28ae52a5-1de4-4639-bcb9-4d6b558099ce.1687338429.4.1688852220.1688737700.68b7e2ca-7e0e-418a-b2cb-aea1483ba39c; _ga_6WCFY7KGNT=GS1.1.1688850446.5.1.1688852220.59.0.0; amp_eb4016=lGzDD-a5vnOgQHK-QL3Y8E...1h4rl9eem.1h4rmvisp.6k.76.dq; OAuth_Token_Request_State=1ef1efc2-e9e4-456a-bc45-b850e34e3a1e; multireferer_id=a%3A1%3A%7Bi%3A3%3Bs%3A24%3A%222023-07-08T21%3A35%3A59%2B0000%22%3B%7D; __cf_bm=eNAyiWYG4OC9zYAV9cpOxXIt3UDDA4pT_O_iZxptCmE-1688852537-0-ASa7/RI+3FlJv1O3jSAQMB0spGsv6aeXgSGJkBGewmHe5MPONJdVpDvbT5Lhl0mD/lkFExyQGYreedwv9+mwjnC4sVtEit8xiCopWuVNa7/wavsj+y6pcsnCTRh+i/ucXw==; ABTasty=uid=wa81pcrygjp7g4gq&fst=1687338426869&pst=1688736589442&cst=1688850746501&ns=4&pvt=17&pvis=2&th='
+
     cookies_dict = {}
     for item in cookies_str.split('; '):
         key, value = item.split('=', maxsplit=1)
@@ -96,8 +94,10 @@ class WebscrapyDownloaderMiddleware:
         #   installed downloader middleware will be called
         # request.cookies = COOKIES
         # request.meta = {'proxy': 'socks5://127.0.0.1:10808'}
-        ua = random.choice(USER_AGENT_LIST)
-        request.headers['User-Agent'] = ua
+        # ua = random.choice(USER_AGENT_LIST)
+        # request.headers['User-Agent'] = ua
+        # print(ua)
+        # print(ua)
 
         return None
 
