@@ -20,7 +20,7 @@ from webscrapy.items import WebscrapyItem
 
 class SpiderSpider(scrapy.Spider):
     name = "spider"
-    allowed_domains = ["www.manomano.fr", "api.bazaarvoice.com", "iam.manomano.fr"]
+    allowed_domains = ["www.manomano.fr", "api.bazaarvoice.com", "iam.manomano.fr", "taobao.com"]
     headers = {}  #
 
     def __init__(self, name=None, **kwargs):
@@ -28,14 +28,19 @@ class SpiderSpider(scrapy.Spider):
         self.browser = None
 
     def start_requests(self):
-        keywords = ['DeWalt', 'Black+and+Decker', 'Stanley', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Irwin+Tools',
-                    'Lenox']
-        company = 'Stanley Black and Decker'
-        keywords = ['dewalt']
+        # keywords = ['Stanley', 'Black+Decker', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Facom', 'MAC Tools', 'Vidmar', 'Lista', 'Irwin Tools', 'Lenox', 'Proto', 'CribMaster', 'Powers Fasteners', 'cub-cadet', 'hustler', 'troy-bilt', 'rover', 'BigDog Mower', 'MTD']
+        # exist_keywords = ['dewalt', 'Stanley', 'Black+Decker', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Facom', 'MAC Tools', 'Vidmar', 'Lista', 'Irwin Tools', 'Lenox', 'Proto', 'CribMaster', 'Powers Fasteners', 'cub-cadet', 'hustler', 'troy-bilt', 'rover', 'BigDog Mower', 'MTD']
 
         """This part should be changed by finding the page numbers of different brand"""
-        for page in range(1,6):
-            start_url = f'https://www.manomano.fr/marque/dewalt-3?page={page}'
+        for page in range(3):
+            start_url = f'https://www.manomano.fr/marque/black-decker-6514?page={page}'
+            # 'https://www.manomano.fr/marque/dewalt-3?page=4'
+            # 'https://www.manomano.fr/marque/stanley-26?page=9'
+            # 'https://www.manomano.fr/marque/irwin-7?page=4'
+            # 'https://www.manomano.fr/marque/bostitch-27?page=5'
+            # 'https://www.manomano.fr/marque/facom-651?page=40'
+            # 'https://www.manomano.fr/marque/black-decker-6514?page=3'
+            
 
             # Load start_url
             self.browser = create_chrome_driver(headless=False)
@@ -53,7 +58,7 @@ class SpiderSpider(scrapy.Spider):
                 review_url_list.append(review_url)
 
             """the review_url_list number can be adjusted by purpose"""
-            for review_url in review_url_list[0:3]:
+            for review_url in review_url_list:
                 self.browser = create_chrome_driver(headless=False)
                 self.browser.get(review_url)
                 """Click the custom infor"""
@@ -91,6 +96,7 @@ class SpiderSpider(scrapy.Spider):
 
                 """Randomly select one open website"""
                 url = 'https://taobao.com/'
+                # 'https://www.amazon.co.uk/'
                 response = HtmlResponse(url=url, body=body, encoding='utf-8')
                 # Create a new Request object based on the HtmlResponse
                 request = Request(url=url, meta={'response': response}, callback=self.customer_review_parse,
