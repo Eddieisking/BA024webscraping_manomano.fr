@@ -40,7 +40,7 @@ class SpiderSpider(scrapy.Spider):
             # 'https://www.manomano.fr/marque/bostitch-27?page=5'
             # 'https://www.manomano.fr/marque/facom-651?page=40'
             # 'https://www.manomano.fr/marque/black-decker-6514?page=3'
-            
+
 
             # Load start_url
             self.browser = create_chrome_driver(headless=False)
