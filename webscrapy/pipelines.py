@@ -142,6 +142,10 @@ class DatabasePipeline:
         # customer_disagree = item.get('customer_disagree', '')
         customer_disagree = 0
         # customer_purchase_date = item.get('customer_purchase_date', '')
+        product_website = item.get('product_website', '')
+        product_brand = item.get('product_brand', '')
+        product_model = item.get('product_model', '')
+        product_type = item.get('product_type', '')
 
         product_name_en = translator(product_name, src='fr')
         customer_review_en = translator(customer_review, src='fr')
@@ -149,10 +153,11 @@ class DatabasePipeline:
         try:
             self.cursor.execute(
                 "INSERT INTO manomano_fr (review_id, product_name, customer_name, customer_rating, customer_date, "
-                "customer_review, customer_support, customer_disagree, product_name_en, customer_review_en) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                "customer_review, customer_support, customer_disagree, product_name_en, customer_review_en, product_website, product_type, product_brand, product_model) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (review_id, product_name, customer_name, customer_rating, customer_date, customer_review,
-                 customer_support, customer_disagree, product_name_en, customer_review_en)
+                 customer_support, customer_disagree, product_name_en, customer_review_en, product_website,
+                 product_type, product_brand, product_model)
             )
             self.conn.commit()
         except Error as e:
