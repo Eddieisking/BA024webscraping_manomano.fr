@@ -30,108 +30,114 @@ class SpiderSpider(scrapy.Spider):
     def start_requests(self):
         # keywords = ['Stanley', 'Black+Decker', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Facom', 'MAC Tools', 'Vidmar', 'Lista', 'Irwin Tools', 'Lenox', 'Proto', 'CribMaster', 'Powers Fasteners', 'cub-cadet', 'hustler', 'troy-bilt', 'rover', 'BigDog Mower', 'MTD']
         # exist_keywords = ['dewalt', 'Stanley', 'Black+Decker', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Facom', 'MAC Tools', 'Vidmar', 'Lista', 'Irwin Tools', 'Lenox', 'Proto', 'CribMaster', 'Powers Fasteners', 'cub-cadet', 'hustler', 'troy-bilt', 'rover', 'BigDog Mower', 'MTD']
+        # 'https://www.manomano.fr/marque/dewalt-3?page=4'
+        # 'https://www.manomano.fr/marque/stanley-26?page=9'
+        # 'https://www.manomano.fr/marque/irwin-7?page=4'
+        # 'https://www.manomano.fr/marque/bostitch-27?page=5'
+        # 'https://www.manomano.fr/marque/facom-651?page=40'
+        # 'https://www.manomano.fr/marque/black-decker-6514?page=3'
+        brand_page_data = [
+            ('dewalt-3', 5),
+            ('stanley-26', 10),
+            ('irwin-7', 4),
+            ('bostitch-27', 5),
+            ('facom-651', 42),
+            ('black-decker-6514', 3)
+        ]
 
-        """This part should be changed by finding the page numbers of different brand"""
-        for page in range(4):
-            start_url = f'https://www.manomano.fr/marque/dewalt-3?page={page}'
-            # 'https://www.manomano.fr/marque/dewalt-3?page=4'
-            # 'https://www.manomano.fr/marque/stanley-26?page=9'
-            # 'https://www.manomano.fr/marque/irwin-7?page=4'
-            # 'https://www.manomano.fr/marque/bostitch-27?page=5'
-            # 'https://www.manomano.fr/marque/facom-651?page=40'
-            # 'https://www.manomano.fr/marque/black-decker-6514?page=3'
-            product_brand = re.search(r'marque\/(.*?)\-(\d+)', start_url).group(1)
+        for brand, page in brand_page_data:
+            for page_num in range(1, page + 1):
+                start_url = f'https://www.manomano.fr/marque/{brand}?page={page_num}'
+                product_brand = re.search(r'marque\/(.*?)\-(\d+)', start_url).group(1)
 
-            # Load start_url
-            self.browser = create_chrome_driver(headless=False)
-            self.browser.get(start_url)
-
-            time.sleep(5)
-            product_links = self.browser.find_elements(By.XPATH,
-                                                 '//div[@class="tG5dru c5PGVKq"]/a')
-
-            # Print the extracted information
-            review_url_list = []
-            for i in range(0, len(product_links)):
-                product_url = product_links[i].get_attribute("href")
-                review_url = product_url + f'#tab-reviews'
-                review_url_list.append(review_url)
-
-            """the review_url_list number can be adjusted by purpose"""
-            for review_url in review_url_list:
-                product_url = review_url.replace('#tab-reviews', '')
+                # Load start_url
                 self.browser = create_chrome_driver(headless=False)
-                self.browser.get(product_url)
-                """Click the custom infor"""
-                self.browser.find_element(By.XPATH, '//button[@id="didomi-notice-agree-button"]').click()
+                self.browser.get(start_url)
 
                 time.sleep(5)
-                product_detail = self.browser.find_elements(By.XPATH,
-                                                            '//div[@data-testid="grid-element-description"]//li[@class="Cp9IuT"]')
+                product_links = self.browser.find_elements(By.XPATH,
+                                                     '//div[@class="tG5dru c5PGVKq"]/a')
 
-                product_model = 'N/A'
-                product_type = 'N/A'
-                for product in product_detail:
-                    # Use relative XPath expressions to find elements within the 'product' element
-                    attr_element = product.find_element(By.XPATH, './/div[@class="b38yzx jKP2zg zu_yu7 gS1w88 nwczhi"]')
-                    value_element = product.find_element(By.XPATH,
-                                                         './/div[@class="b38yzx jKP2zg c35g1Kh gS1w88 xrGupg"]')
+                # Print the extracted information
+                review_url_list = []
+                for i in range(0, len(product_links)):
+                    product_url = product_links[i].get_attribute("href")
+                    review_url = product_url + f'#tab-reviews'
+                    review_url_list.append(review_url)
 
-                    # Extract the text from the 'attr_element' and 'value_element'
-                    attr = attr_element.text.strip()
-                    value = value_element.text.strip()
-                    print('attr, value')
+                """the review_url_list number can be adjusted by purpose"""
+                for review_url in review_url_list:
+                    product_url = review_url.replace('#tab-reviews', '')
+                    self.browser = create_chrome_driver(headless=False)
+                    self.browser.get(product_url)
+                    """Click the custom infor"""
+                    self.browser.find_element(By.XPATH, '//button[@id="didomi-notice-agree-button"]').click()
 
-                    print(attr, value)
-                    if attr == 'Réf. fabricant':
-                        product_model = value if value else 'N/A'
-                    elif attr == 'Matières':
-                        product_type = value if value else 'N/A'
+                    time.sleep(5)
+                    product_detail = self.browser.find_elements(By.XPATH,
+                                                                '//div[@data-testid="grid-element-description"]//li[@class="Cp9IuT"]')
 
-                self.browser = create_chrome_driver(headless=False)
-                self.browser.get(review_url)
-                """Click the custom infor"""
-                self.browser.find_element(By.XPATH, '//button[@id="didomi-notice-agree-button"]').click()
+                    product_model = 'N/A'
+                    product_type = 'N/A'
+                    for product in product_detail:
+                        # Use relative XPath expressions to find elements within the 'product' element
+                        attr_element = product.find_element(By.XPATH, './/div[@class="b38yzx jKP2zg zu_yu7 gS1w88 nwczhi"]')
+                        value_element = product.find_element(By.XPATH,
+                                                             './/div[@class="b38yzx jKP2zg c35g1Kh gS1w88 xrGupg"]')
 
-                time.sleep(5)
-                try:
-                    self.browser.find_element(By.XPATH, '//input[@type="checkbox"]').click()
-                except:
-                    print('No more robot test')
+                        # Extract the text from the 'attr_element' and 'value_element'
+                        attr = attr_element.text.strip()
+                        value = value_element.text.strip()
 
-                """Click the more reviews button to load all infor"""
-                while True:
+                        if attr == 'Réf. fabricant':
+                            product_model = value if value else 'N/A'
+                        elif attr == 'Matières':
+                            product_type = value if value else 'N/A'
+
+                    self.browser = create_chrome_driver(headless=False)
+                    self.browser.get(review_url)
+                    """Click the custom infor"""
+                    self.browser.find_element(By.XPATH, '//button[@id="didomi-notice-agree-button"]').click()
+
+                    time.sleep(5)
                     try:
-                    # Click the load more button
-                        more_review_button = self.browser.find_element(By.XPATH, '//div[@data-testid="see-more-reviews"]')
-                        more_review_button.click()
-                        time.sleep(1)
+                        self.browser.find_element(By.XPATH, '//input[@type="checkbox"]').click()
                     except:
-                        print('No more pages')
+                        print('No more robot test')
 
-                    # Click the next load more button
-                    try:
-                        more_review_button_new = WebDriverWait(self.browser, 5).until(
-                            EC.presence_of_element_located((By.XPATH, '//div[@data-testid="see-more-reviews"]'))
-                        )
-                        more_review_button = more_review_button_new
-                    except:
-                        print('No more extra pages')
-                        break
-                print('No more extra customer reviews')
+                    """Click the more reviews button to load all infor"""
+                    while True:
+                        try:
+                        # Click the load more button
+                            more_review_button = self.browser.find_element(By.XPATH, '//div[@data-testid="see-more-reviews"]')
+                            more_review_button.click()
+                            time.sleep(1)
+                        except:
+                            print('No more pages')
 
-                # Use selenium page source to pass the response
-                body = self.browser.page_source
+                        # Click the next load more button
+                        try:
+                            more_review_button_new = WebDriverWait(self.browser, 5).until(
+                                EC.presence_of_element_located((By.XPATH, '//div[@data-testid="see-more-reviews"]'))
+                            )
+                            more_review_button = more_review_button_new
+                        except:
+                            print('No more extra pages')
+                            break
+                    print('No more extra customer reviews')
 
-                """Randomly select one open website"""
-                url = 'https://taobao.com/'
-                # 'https://www.amazon.co.uk/'
-                response = HtmlResponse(url=url, body=body, encoding='utf-8')
-                # Create a new Request object based on the HtmlResponse
-                request = Request(url=url, meta={'response': response, 'product_model':product_model, 'product_brand':product_brand, 'product_type': product_type}, callback=self.customer_review_parse,
-                                  dont_filter=True)
+                    # Use selenium page source to pass the response
+                    body = self.browser.page_source
 
-                yield request
+                    """Randomly select one open website"""
+                    url = 'https://taobao.com/'
+                    # 'https://www.amazon.co.uk/'
+                    response = HtmlResponse(url=url, body=body, encoding='utf-8')
+                    # Create a new Request object based on the HtmlResponse
+                    request = Request(url=url, meta={'response': response, 'product_model':product_model, 'product_brand':product_brand, 'product_type': product_type}, callback=self.customer_review_parse,
+                                      dont_filter=True)
+
+                    yield request
 
     def customer_review_parse(self, response):
         product_type = response.meta['product_type']
