@@ -46,7 +46,7 @@ To run this project on your local machine, follow these steps:
 
 ## Contributions
 
-Contributions to this project are welcome! If you have any suggestions, improvements, or bug fixes, please create an [issue](https://github.com/Eddieisking/BA024webscraping_taobao.com/issues) or submit a pull [request]([https://github.com/Eddieisking/BA024webscraping_LeroyMerlin.fr/pulls](https://github.com/Eddieisking/BA024webscraping_taobao.com/pulls)).
+Contributions to this project are welcome! If you have any suggestions, improvements, or bug fixes, please create an [issue](https://github.com/Eddieisking/BA024webscraping_manomano.fr/issues) or submit a pull [request](https://github.com/Eddieisking/BA024webscraping_manomano.fr/pulls).
 
 ## Contact
 
