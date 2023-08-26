@@ -1,7 +1,7 @@
 """
 Project: Web scraping for customer reviews
 Author: Hào Cui
-Date: 07/04/2023
+Date: 07/11/2023
 """
 import time
 import re
@@ -21,21 +21,13 @@ from webscrapy.items import WebscrapyItem
 class SpiderSpider(scrapy.Spider):
     name = "spider"
     allowed_domains = ["www.manomano.fr", "api.bazaarvoice.com", "iam.manomano.fr", "taobao.com"]
-    headers = {}  #
+    headers = {}  
 
     def __init__(self, name=None, **kwargs):
         super().__init__(name=name, **kwargs)
         self.browser = None
 
     def start_requests(self):
-        # keywords = ['Stanley', 'Black+Decker', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Facom', 'MAC Tools', 'Vidmar', 'Lista', 'Irwin Tools', 'Lenox', 'Proto', 'CribMaster', 'Powers Fasteners', 'cub-cadet', 'hustler', 'troy-bilt', 'rover', 'BigDog Mower', 'MTD']
-        # exist_keywords = ['dewalt', 'Stanley', 'Black+Decker', 'Craftsman', 'Porter-Cable', 'Bostitch', 'Facom', 'MAC Tools', 'Vidmar', 'Lista', 'Irwin Tools', 'Lenox', 'Proto', 'CribMaster', 'Powers Fasteners', 'cub-cadet', 'hustler', 'troy-bilt', 'rover', 'BigDog Mower', 'MTD']
-        # 'https://www.manomano.fr/marque/dewalt-3?page=4'
-        # 'https://www.manomano.fr/marque/stanley-26?page=9'
-        # 'https://www.manomano.fr/marque/irwin-7?page=4'
-        # 'https://www.manomano.fr/marque/bostitch-27?page=5'
-        # 'https://www.manomano.fr/marque/facom-651?page=40'
-        # 'https://www.manomano.fr/marque/black-decker-6514?page=3'
         brand_page_data = [
             ('dewalt-3', 5),
             ('stanley-26', 10),
@@ -53,7 +45,6 @@ class SpiderSpider(scrapy.Spider):
                 # Load start_url
                 self.browser = create_chrome_driver(headless=False)
                 self.browser.get(start_url)
-
                 time.sleep(5)
                 product_links = self.browser.find_elements(By.XPATH,
                                                      '//div[@class="tG5dru c5PGVKq"]/a')
@@ -70,13 +61,13 @@ class SpiderSpider(scrapy.Spider):
                     product_url = review_url.replace('#tab-reviews', '')
                     self.browser = create_chrome_driver(headless=False)
                     self.browser.get(product_url)
+                    
                     """Click the custom infor"""
                     self.browser.find_element(By.XPATH, '//button[@id="didomi-notice-agree-button"]').click()
 
                     time.sleep(5)
                     product_detail = self.browser.find_elements(By.XPATH,
                                                                 '//div[@data-testid="grid-element-description"]//li[@class="Cp9IuT"]')
-
                     product_model = 'N/A'
                     product_type = 'N/A'
                     for product in product_detail:
@@ -88,7 +79,6 @@ class SpiderSpider(scrapy.Spider):
                         # Extract the text from the 'attr_element' and 'value_element'
                         attr = attr_element.text.strip()
                         value = value_element.text.strip()
-
                         if attr == 'Réf. fabricant':
                             product_model = value if value else 'N/A'
                         elif attr == 'Matières':
@@ -96,6 +86,7 @@ class SpiderSpider(scrapy.Spider):
 
                     self.browser = create_chrome_driver(headless=False)
                     self.browser.get(review_url)
+                    
                     """Click the custom infor"""
                     self.browser.find_element(By.XPATH, '//button[@id="didomi-notice-agree-button"]').click()
 
@@ -108,7 +99,7 @@ class SpiderSpider(scrapy.Spider):
                     """Click the more reviews button to load all infor"""
                     while True:
                         try:
-                        # Click the load more button
+                            # Click the load more button
                             more_review_button = self.browser.find_element(By.XPATH, '//div[@data-testid="see-more-reviews"]')
                             more_review_button.click()
                             time.sleep(1)
@@ -131,8 +122,8 @@ class SpiderSpider(scrapy.Spider):
 
                     """Randomly select one open website"""
                     url = 'https://taobao.com/'
-                    # 'https://www.amazon.co.uk/'
                     response = HtmlResponse(url=url, body=body, encoding='utf-8')
+                    
                     # Create a new Request object based on the HtmlResponse
                     request = Request(url=url, meta={'response': response, 'product_model':product_model, 'product_brand':product_brand, 'product_type': product_type}, callback=self.customer_review_parse,
                                       dont_filter=True)
@@ -143,16 +134,13 @@ class SpiderSpider(scrapy.Spider):
         product_type = response.meta['product_type']
         product_brand = response.meta['product_brand']
         product_model = response.meta['product_model']
-
         html_response = response.meta['response']
         selector = Selector(response=html_response)
-
         review_list = selector.xpath('//div[@class="c44RvHG"]/div[@class="jPgt-8"]')
 
         # Apply selectors to extract information
         for review in review_list:
             item = WebscrapyItem()
-
             item['product_website'] = 'manomano_fr'
             item['product_type'] = product_type
             item['product_brand'] = product_brand
